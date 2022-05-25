@@ -1,0 +1,50 @@
+{
+  "name": "svelfed",
+  "version": "0.0.1",
+  "scripts": {
+    "dev": "svelte-kit dev --host 0.0.0.0",
+    "build": "svelte-kit build",
+    "package": "svelte-kit package",
+    "preview": "svelte-kit preview",
+    "prepare": "svelte-kit sync",
+    "check": "svelte-check --tsconfig ./tsconfig.json",
+    "check:watch": "svelte-check --tsconfig ./tsconfig.json --watch",
+    "lint": "eslint --ignore-path .gitignore ."
+  },
+  "devDependencies": {
+    "@sveltejs/adapter-auto": "next",
+    "@sveltejs/adapter-node": "1.0.0-next.74",
+    "@sveltejs/kit": "next",
+    "@tailwindcss/forms": "^0.5.2",
+    "@tailwindcss/typography": "^0.5.2",
+    "@types/cookie": "^0.5.1",
+    "@types/jsonwebtoken": "^8.5.8",
+    "@types/pg": "^8.6.5",
+    "@types/sha.js": "^2.4.0",
+    "@typescript-eslint/eslint-plugin": "^5.26.0",
+    "@typescript-eslint/parser": "^5.26.0",
+    "autoprefixer": "^10.4.7",
+    "eslint": "^8.16.0",
+    "eslint-plugin-svelte3": "^4.0.0",
+    "postcss": "^8.4.14",
+    "postcss-load-config": "^3.1.4",
+    "svelte": "^3.48.0",
+    "svelte-check": "^2.7.1",
+    "svelte-preprocess": "^4.10.6",
+    "tailwindcss": "^3.0.24",
+    "tslib": "^2.4.0",
+    "typescript": "~4.6.4"
+  },
+  "type": "module",
+  "dependencies": {
+    "base64url": "^3.0.1",
+    "compression": "^1.7.4",
+    "cookie": "^0.5.0",
+    "ioredis": "^5.0.5",
+    "jsonwebtoken": "^8.5.1",
+    "jwt-decode": "^3.1.2",
+    "pg": "^8.7.3",
+    "polka": "^0.5.2",
+    "sha.js": "^2.4.11"
+  }
+}

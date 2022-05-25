@@ -1,0 +1,21 @@
+{
+    "workbench.colorCustomizations": {
+        "activityBar.background": "#302F06",
+        "titleBar.activeBackground": "#434209",
+        "titleBar.activeForeground": "#FCFBE6"
+    },
+    "editor.codeActionsOnSave": {
+        "source.organizeImports": true,
+        "source.fixAll": true
+    },
+    "editor.formatOnSave": true,
+    "editor.tabSize": 2,
+    "javascript.preferences.importModuleSpecifier": "non-relative",
+    "search.exclude": {
+        "**/build": true,
+        "**/.svelte-kit": true,
+        "**/node_modules": true,
+        "**/bower_components": true,
+        "**/*.code-search": true
+    }
+}
