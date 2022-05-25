@@ -1,0 +1,6 @@
+app/
+api/
+
+.env
+.env.*
+!.env.example

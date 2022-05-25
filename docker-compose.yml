@@ -1,0 +1,137 @@
+version: "3"
+
+volumes:
+  data-minio:
+  data-pg:
+  data-redis:
+
+
+services:
+  tunnel:
+    image: cloudflare/cloudflared:2022.5.0
+    command: tunnel --no-autoupdate run --token ${TUNNEL_TOKEN}
+    container_name: tunnel
+
+  traefik:
+    image: traefik:2.6
+    command:
+      - --log.level=INFO
+      - --global.checkNewVersion=false
+      - --global.sendAnonymousUsage=false
+      - --api.insecure=true
+      - --api.dashboard=true
+      - --entrypoints.http.address=:80
+      - --entrypoints.http.forwardedHeaders.insecure=true
+      - --entrypoints.https.address=:443
+      - --entrypoints.https.forwardedHeaders.insecure=true
+      - --providers.docker=true
+      - --providers.docker.exposedbydefault=false
+    container_name: traefik
+    networks:
+      default:
+        aliases:
+          - foobar.${DOMAIN}
+    ports:
+      - 80:80
+      - 8080:8080
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+
+  db:
+    image: postgres:latest
+    container_name: pg
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASS}
+    ports:
+      - 5432:5432
+    volumes:
+      - data-pg:/var/lib/postgresql/data
+      - ./src/pg/initdb.d:/docker-entrypoint-initdb.d
+
+  auth:
+    image: quay.io/keycloak/keycloak:${KC_VERSION}
+    command: start --auto-build
+    container_name: auth
+    environment:
+      - KEYCLOAK_ADMIN=${KC_ADMIN}
+      - KEYCLOAK_ADMIN_PASSWORD=${KC_ADMIN_PASSWORD}
+      - KC_DB=postgres
+      - KC_DB_URL=jdbc:postgresql://${DB_HOST}:5432/keycloak?ssl=allow
+      - KC_DB_USERNAME=${DB_USER}
+      - KC_DB_PASSWORD=${DB_PASS}
+      - KC_HOSTNAME=${DOMAIN}
+      - KC_HTTP_ENABLED=true
+      - KC_HTTP_RELATIVE_PATH=auth
+      - KC_PROXY=edge
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.auth.loadbalancer.server.port=8080
+      - traefik.http.routers.auth.rule=Host(`${DOMAIN}`) && ( PathPrefix(`/auth/.well-known`) || PathPrefix(`/auth/admin`) || PathPrefix(`/auth/realms`) || PathPrefix(`/auth/js`) || PathPrefix(`/auth/resources`) )
+      - traefik.http.routers.auth.entrypoints=http
+
+  redis:
+    image: redis:alpine
+    container_name: redis
+    environment:
+      - REDIS_REPLICATION_MODE=master
+      - ALLOW_EMPTY_PASSWORD=yes
+    ports:
+      - 6379:6379
+    volumes:
+      - data-redis:/var/lib/redis
+
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    container_name: minio
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.minio.loadbalancer.server.port=9000
+      - traefik.http.routers.minio.rule=Host(`${DOMAIN}`) && PathPrefix(`/static`)
+      - traefik.http.routers.minio.entrypoints=http
+      - traefik.http.routers.minio.middlewares=minio-stripprefix
+      - traefik.http.middlewares.minio-stripprefix.stripprefix.prefixes=/static
+    ports:
+      - 9001:9001
+    volumes:
+      - data-minio:/data
+
+  api:
+    image: node:16
+    command: npm run dev
+    environment:
+      PGHOST: pg
+      PGDATABASE: ${DB_NAME}
+      PGUSER: ${DB_USER}
+      PGPASSWORD: ${DB_PASS}
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.api.loadbalancer.server.port=3000
+      - traefik.http.routers.api.rule=Host(`${DOMAIN}`) && HeadersRegexp(`accept`, `application/[/\w\+]*json`)
+      - traefik.http.routers.api.entrypoints=http
+    volumes:
+      - ../api/:/usr/src/app
+    working_dir: /usr/src/app
+
+  ui:
+    image: node:16
+    command: npm run dev
+    environment:
+      PGHOST: pg
+      PGDATABASE: ${DB_NAME}
+      PGUSER: ${DB_USER}
+      PGPASSWORD: ${DB_PASS}
+    labels:
+      - traefik.enable=true
+      - traefik.http.services.ui.loadbalancer.server.port=3000
+      - traefik.http.routers.ui.rule=Host(`${DOMAIN}`)
+      - traefik.http.routers.ui.entrypoints=http
+    ports:
+      - 3000:3000
+    volumes:
+      - ../ui/:/usr/src/app
+    working_dir: /usr/src/app
