@@ -1,5 +1,6 @@
 THIS_FILE := $(lastword $(MAKEFILE_LIST))
-.PHONY: build up start down clean stop restart logs logs-api ps login-timescale login-api db-shell
+SERVICES := tunnel traefik db auth minio redis
+.PHONY: build up start down clean stop restart logs logs-api ps login-timescale login-api db-shell api app
 build:
 	docker compose -f docker-compose.yml build $(c)
 up:
@@ -23,10 +24,10 @@ ps:
 	docker compose -f docker-compose.yml ps
 db-shell:
 	docker compose -f docker-compose.yml exec timescale psql -Upostgres
-code:
-	code api && code ui
+mw:
+	docker compose -f docker-compose.yml up -d ${SERVICES} 
+	docker compose -f docker-compose.yml logs -f --tail 100 ${SERVICES} 
 api:
-	docker compose -f docker-compose.yml up -d tunnel traefik db auth minio redis
-	docker compose -f docker-compose.yml logs -f --tail 100 tunnel traefik db auth minio redis
-ui:
-	docker compose -f docker-compose.yml up ui
+	docker compose -f docker-compose.yml up api 
+app:
+	docker compose -f docker-compose.yml up app
