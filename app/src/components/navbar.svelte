@@ -38,7 +38,10 @@
     <div class="{hidden ? 'hidden' : ''} lg:flex flex-grow items-center">
       <ul class="flex flex-col lg:flex-row list-none ml-auto">
         {#if loggedin}
-          <Link href="/users/{$userProfile?.username}" text="Profile" />
+          <Link
+            href="/users/{$userProfile.preferred_username}"
+            text="Profile"
+          />
           <Link href="/auth/logout" text="Logout" />
         {:else}
           <Link href="/auth/login" rel="external" text="Login" />

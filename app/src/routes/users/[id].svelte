@@ -1,6 +1,13 @@
-<script lang="ts">
+<script lang="ts" context="module">
   import { config } from "$lib/config";
+  import type { Load } from "@sveltejs/kit";
 
+  export const load: Load = async ({ props }) => {
+    return { props };
+  };
+</script>
+
+<script lang="ts">
   export let user: Record<string, any>;
 </script>
 

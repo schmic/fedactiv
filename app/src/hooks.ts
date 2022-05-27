@@ -1,4 +1,6 @@
 import type { GetSession, Handle } from "@sveltejs/kit";
+import { parse } from "cookie";
+import jwt_decode from "jwt-decode";
 import { config } from "./lib/config";
 
 const { oidc } = config
@@ -16,9 +18,25 @@ export const handle: Handle = async ({ event, resolve }) => {
     // const { sid } = cookies
     // console.log('sid', sid)
 
-    return await resolve(event);
+    // before endpoint
+
+    console.log(`first`)
+
+    const response = await resolve(event);
+
+    // after endpoint
+    console.log(`last`)
+
+    return response
 };
 
-export const getSession: GetSession = () => {
-    return {};
+export const getSession: GetSession = ({ request }) => {
+    const cookies = parse(request.headers.get('cookie') || '')
+
+    if (!cookies.sid)
+        return {};
+
+    return {
+        profile: jwt_decode<Profile>(cookies.sid)
+    }
 };

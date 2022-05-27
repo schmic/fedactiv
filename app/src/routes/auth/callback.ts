@@ -2,7 +2,7 @@ import { config } from '$lib/config';
 import { redis } from '$lib/redis';
 import type { RequestHandler } from '@sveltejs/kit';
 import { serialize, type CookieSerializeOptions } from 'cookie';
-import { createHash, randomUUID } from 'crypto';
+import jwt_decode from "jwt-decode";
 
 const cookieOptions: CookieSerializeOptions = {
     path: '/',
@@ -20,7 +20,7 @@ export const get: RequestHandler = async ({ url }) => {
     const code = url.searchParams.get('code')
     const state = url.searchParams.get('state')
 
-    if (!state || !code) // FIXME: check for error and messinge in searchParams first
+    if (!state || !code) // FIXME: check for error and message in searchParams first
         throw new Error(`no code:${code} or state:${state} in response`)
 
     const { code_verifier } = JSON.parse(await redis.get(`oidc:${state}`) || '{}')
@@ -52,20 +52,20 @@ export const get: RequestHandler = async ({ url }) => {
     const tokenData = await tokenResponse.json()
     const { id_token, access_token, refresh_token } = tokenData
 
+    // const sessionId = `${createHash('sha256').update(randomUUID()).digest('hex')}`
 
-
-    const sessionId = `${createHash('sha256').update(randomUUID()).digest('hex')}`
-    const sessionCookie = serialize('sid', sessionId, cookieOptions)
+    const sessionCookie = serialize('sid', id_token, cookieOptions)
     const accessCookie = serialize('atkn', access_token, cookieOptions)
     const refreshCookie = serialize('rtkn', refresh_token, cookieOptions)
 
+    const profile = jwt_decode<Record<string, string>>(id_token)
+
     return {
-        status: 200,
+        status: 302,
         headers: {
+            'Location': `/users/${profile.preferred_username}`,
             'Set-Cookie': [sessionCookie, accessCookie, refreshCookie]
         },
-        body: {
-            tokens: { id_token }
-        }
+
     }
 }
