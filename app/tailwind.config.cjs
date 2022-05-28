@@ -5,7 +5,11 @@ module.exports = {
 	},
 	plugins: [
 		require('@tailwindcss/forms'),
-		// require('@tailwindcss/typography'),
+		require('daisyui')
 	],
 	content: ["./src/**/*.{html,js,svelte,ts}"],
+	daisyui: {
+		styled: true,
+		themes: ["light", "business", "corporate"],
+	}
 };
