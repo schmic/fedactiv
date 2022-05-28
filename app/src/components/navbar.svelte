@@ -2,14 +2,14 @@
   import Link from "$components/navbar/link.svelte";
   import { userProfile } from "$lib/users";
 
+  let loggedin: boolean = false;
   let hidden = true;
-  let loggedin = false;
 
-  $: loggedin = $userProfile !== undefined;
+  $: loggedin = $userProfile ? true : false;
 </script>
 
 <nav
-  class="relative flex flex-wrap items-center justify-between px-4 py-3 bg-lime-500"
+  class="relative flex flex-wrap items-center justify-between px-4 py-3 bg-green-500"
 >
   <div
     class="container px-2 mx-auto flex flex-wrap items-center justify-between"
@@ -44,7 +44,7 @@
           />
           <Link href="/auth/logout" text="Logout" />
         {:else}
-          <Link href="/auth/login" rel="external" text="Login" />
+          <Link href="/auth/login" text="Login" />
         {/if}
       </ul>
     </div>

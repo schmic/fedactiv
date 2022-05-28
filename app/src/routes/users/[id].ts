@@ -5,11 +5,15 @@ export const get: RequestHandler = async ({ params, url }) => {
   const { id } = params;
   const { domain } = config
 
-  console.log(`${id}@${domain}`, url.pathname)
+  console.log(`${url.pathname} => ${id}@${domain}`)
 
   const resp = await fetch(`http://api:3000${url.pathname}`)
-  if (!resp.ok)
+
+  if (resp.status === 404)
     return { status: 404 }
+
+  if (!resp.ok)
+    return { status: resp.status }
 
   const user = await resp.json()
 

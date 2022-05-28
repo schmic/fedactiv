@@ -1,4 +1,5 @@
 <script lang="ts" context="module">
+  import { browser } from "$app/env";
   import Navbar from "$components/navbar.svelte";
   import { UserContext, userProfile } from "$lib/users";
   import type { Load } from "@sveltejs/kit";
@@ -6,7 +7,9 @@
   import "../app.css";
 
   export const load: Load = async ({ session }) => {
-    if (session.profile) userProfile.set(session.profile);
+    if (browser && session.profile) {
+      userProfile.set(session.profile);
+    }
     return {};
   };
 </script>

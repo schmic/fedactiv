@@ -20,18 +20,20 @@ export const handle: Handle = async ({ event, resolve }) => {
 
     // before endpoint
 
-    console.log(`first`)
+    console.log(`handle() before`)
 
     const response = await resolve(event);
 
     // after endpoint
-    console.log(`last`)
+    console.log(`handle() after`)
 
     return response
 };
 
 export const getSession: GetSession = ({ request }) => {
     const cookies = parse(request.headers.get('cookie') || '')
+
+    console.log(`getSession()`)
 
     if (!cookies.sid)
         return {};
