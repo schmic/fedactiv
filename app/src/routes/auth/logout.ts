@@ -9,7 +9,7 @@ const cookieOptions: CookieSerializeOptions = {
   expires: new Date(1970, 1, 1)
 }
 
-export const get: RequestHandler = async ({ url }) => {
+export const get: RequestHandler = async () => {
   const sidCookie = serialize('sid', '', cookieOptions)
   const atknCookie = serialize('atkn', '', cookieOptions)
   const rtknCookie = serialize('rtkn', '', cookieOptions)

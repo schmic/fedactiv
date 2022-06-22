@@ -2,14 +2,23 @@ CREATE DATABASE keycloak;
 
 \connect fedactiv;
 
-CREATE TABLE public.users (
-	id varchar NULL,
-	name varchar NULL,
-	summary varchar NULL,
-	icon varchar NULL
+CREATE TABLE "public"."users" (
+  "sub" varchar,
+  "id" varchar,
+  "given_name" varchar,
+  "family_name" varchar,
+  "summary" varchar NULL,
+  "icon" varchar NULL,
+  PRIMARY KEY ("id")
 );
 
-INSERT INTO public.users
-    (id, "name", summary, icon)
-VALUES
-    ('schmic', 'Michael', 'someone trying ActivityPub stuff', NULL);
+CREATE TABLE "public"."dropbox" (
+  "userId" varchar,
+  "tokens" json,
+  PRIMARY KEY ("userId")
+);
+
+-- INSERT INTO public.users
+--     (id, "name", summary, icon)
+-- VALUES
+--     ('schmic', 'Michael', 'someone trying ActivityPub stuff', NULL);

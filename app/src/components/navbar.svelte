@@ -1,11 +1,14 @@
 <script lang="ts">
   import Link from "$components/navbar/link.svelte";
-  import { userProfile } from "$lib/users";
+  import { UserContext } from "$src/lib/users";
+  import { getContext } from "svelte";
+
+  const profile = getContext<PublicProfile>(UserContext);
 
   let loggedin: boolean = false;
   let hidden = true;
 
-  $: loggedin = $userProfile ? true : false;
+  $: loggedin = profile ? true : false;
 </script>
 
 <nav
@@ -38,10 +41,8 @@
     <div class="{hidden ? 'hidden' : ''} lg:flex flex-grow items-center">
       <ul class="flex flex-col lg:flex-row list-none ml-auto">
         {#if loggedin}
-          <Link
-            href="/users/{$userProfile.preferred_username}"
-            text="Profile"
-          />
+          <Link href="/activity/upload" text="Upload" />
+          <Link href="/users/{profile.preferred_username}" text="Profile" />
           <Link href="/auth/logout" text="Logout" />
         {:else}
           <Link href="/auth/login" text="Login" />

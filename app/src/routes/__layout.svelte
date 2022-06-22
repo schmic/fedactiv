@@ -1,21 +1,23 @@
 <script lang="ts" context="module">
-  import { browser } from "$app/env";
   import Navbar from "$components/navbar.svelte";
-  import { UserContext, userProfile } from "$lib/users";
+  import { UserContext } from "$lib/users";
   import type { Load } from "@sveltejs/kit";
   import { setContext } from "svelte";
   import "../app.css";
 
   export const load: Load = async ({ session }) => {
-    if (browser && session.profile) {
-      userProfile.set(session.profile);
-    }
-    return {};
+    const { profile } = session;
+    return {
+      props: {
+        profile,
+      },
+    };
   };
 </script>
 
 <script lang="ts">
-  setContext(UserContext, userProfile);
+  export let profile: Profile;
+  setContext(UserContext, profile);
 </script>
 
 <svelte:head>

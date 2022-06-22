@@ -15,7 +15,7 @@ export const get: RequestHandler = async ({ params, url }) => {
   if (!resp.ok)
     return { status: resp.status }
 
-  const user = await resp.json()
+  const user: PublicProfile = await resp.json()
 
   return {
     status: 200,

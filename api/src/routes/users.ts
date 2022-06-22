@@ -9,7 +9,8 @@ const router = new Router({
 
 type User = {
     id: string
-    name: string
+    given_name: string
+    family_name: string
     summary: string
     icon: string
 }
@@ -29,10 +30,10 @@ router.param('id', async (id, ctx: ParameterizedContext, next) => {
 router.get('/:id', (ctx: ParameterizedUserContext) => {
     const { domain } = config
 
-    const { id, name, summary, icon } = ctx.user
-    const preferredUsername = id
+    const { id, given_name, family_name, summary, icon } = ctx.user
+    const preferred_username = id
 
-    console.log('users/id', id)
+    console.log('users/id', id, icon)
 
     ctx.body = {
         '@context': 'https://www.w3.org/ns/activitystreams',
@@ -45,18 +46,21 @@ router.get('/:id', (ctx: ParameterizedUserContext) => {
         'following': `https://${domain}/users/${id}/following`,
         'liked': `https://${domain}/users/${id}/liked`,
 
-        preferredUsername,
-        name,
+        preferred_username,
+        given_name,
+        family_name,
         summary,
         'icon': {
             'type': 'Image',
-            'mediaType': 'image/jpeg',
-            'url': `https://${domain}/static/accounts/avatars/78c11c1f6fbe3478.jpg`
+            'mediaType': 'image/png',
+            'url': icon ?
+                `https://${domain}/static/accounts/avatars/${icon}.png` :
+                `https://${domain}/avatar.png`
         },
-        'image': {
+        'image': icon || 'avatar' && {
             'type': 'Image',
             'mediaType': 'image/jpeg',
-            'url': `https://${domain}/static/accounts/headers/5ccb5da5e7712901.jpg`
+            'url': `https://${domain}/static/accounts/headers/${icon}.jpg`
         }
     }
     ctx.type = 'application/ld+json'

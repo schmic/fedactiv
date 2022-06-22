@@ -108,10 +108,12 @@ services:
       PGDATABASE: ${DB_NAME}
       PGUSER: ${DB_USER}
       PGPASSWORD: ${DB_PASS}
+      MINIO_ACCESS_KEY: 9qIWRacwS6RJDqgl
+      MINIO_SECRET_KEY: B64h7kdlCMinn9xIOcAe7Xjh5864yr2W
     labels:
       - traefik.enable=true
       - traefik.http.services.api.loadbalancer.server.port=3000
-      - traefik.http.routers.api.rule=Host(`${DOMAIN}`) && HeadersRegexp(`accept`, `application/[/\w\+]*json`)
+      - traefik.http.routers.api.rule=Host(`${DOMAIN}`) && ( HeadersRegexp(`accept`, `application/[/\w\+]*json`) || PathPrefix(`/api`) )
       - traefik.http.routers.api.entrypoints=http
     volumes:
       - ./api/:/usr/src/app

@@ -1,0 +1,69 @@
+@fqdn = fedactiv.schmic.eu
+# @fqdn = pixelfed.social
+# @fqdn = mastodon.social
+@username = schmic
+
+####
+# @name webfinger
+GET https://{{fqdn}}/.well-known/webfinger?resource=acct:{{username}}@{{fqdn}}
+
+####
+# @name profile
+GET https://{{fqdn}}/users/{{username}}
+Accept: text/html
+
+####
+# @name profile
+GET https://{{fqdn}}/users/{{username}}
+Accept: application/ld+json
+
+####
+# @name followers
+GET {{profile.response.body.followers}}
+Accept: application/ld+json
+
+####
+# @name following
+GET {{profile.response.body.following}}
+Accept: application/ld+json
+
+####
+# @name liked
+GET {{profile.response.body.liked}}
+Accept: application/ld+json
+
+####
+# @name inbox
+GET {{profile.response.body.inbox}}
+Accept: application/ld+json
+
+####
+# @name outbox
+GET {{profile.response.body.outbox}}
+Accept: application/ld+json
+
+####
+# @name outbox_first
+GET {{outbox.response.body.first}}
+Accept: application/ld+json
+
+####
+# @name followers_first
+GET {{followers.response.body.first}}
+Accept: application/ld+json
+
+####
+GET https://{{fqdn}}/users/{{username}}
+Accept: text/html
+
+
+#### META ##################################
+
+# @name nodeinfo
+GET https://{{fqdn}}/.well-known/nodeinfo
+
+####
+GET https://{{fqdn}}/nodeinfo/2.0
+
+####
+GET https://{{fqdn}}/api/v1/instance

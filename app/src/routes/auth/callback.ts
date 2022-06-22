@@ -1,5 +1,6 @@
 import { config } from '$lib/config';
 import { redis } from '$lib/redis';
+import { pool } from '$src/lib/database';
 import type { RequestHandler } from '@sveltejs/kit';
 import { serialize, type CookieSerializeOptions } from 'cookie';
 import jwt_decode from "jwt-decode";
@@ -58,7 +59,11 @@ export const get: RequestHandler = async ({ url }) => {
     const accessCookie = serialize('atkn', access_token, cookieOptions)
     const refreshCookie = serialize('rtkn', refresh_token, cookieOptions)
 
-    const profile = jwt_decode<Record<string, string>>(id_token)
+    const profile = jwt_decode<Profile>(id_token)
+
+    pool.query('INSERT INTO users ("sub", "id", "given_name", "family_name") VALUES($1, $2, $3, $4) ON CONFLICT DO NOTHING;', [
+        profile.sub, profile.preferred_username, profile.given_name, profile.family_name
+    ])
 
     return {
         status: 302,
